@@ -54,7 +54,7 @@ def main_window():
     layout = [
             [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16), sg.Button("Search", size=BUTTON_SIZE)],
             [sg.Push(), sg.Input(disabled=True, key='OUTPUT', size=28 , visible=True), sg.Btn("copy", size=BUTTON_SIZE, visible=True)],
-            [sg.Push() , sg.Button("Reset", size=BUTTON_SIZE) , sg.Exit(size=BUTTON_SIZE, button_color="tomato")],
+            [sg.Btn("ⓘ", pad=(20, 0)), sg.Push() , sg.Button("Reset", size=BUTTON_SIZE) , sg.Exit(size=BUTTON_SIZE, button_color="tomato")],
     ]
 
     window_title = "IRD PAN Search"
@@ -82,6 +82,12 @@ def main_window():
                 copy(window['OUTPUT'].Get())
             except PyperclipException as exception_msg:
                 sg.popup_no_titlebar(exception_msg)
+        
+        if event == "ⓘ":
+            window.disappear()
+            sg.popup("Version 1.0", "Developed by Ashish Kandu", grab_anywhere=True, title="About")
+            window.reappear()
+            # sg.popup_notify("Developed By Ashish Kandu", title="About")
     window.close()
 
 def verify_input_type(pan_input):
