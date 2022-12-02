@@ -27,13 +27,13 @@ def create_file_if_not_exist(filename):
 
 def main_window():
     layout = [
-            [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16, default_text="128064643"), sg.Button("Search", size=BUTTON_SIZE)],
+            [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16), sg.Button("Search", size=BUTTON_SIZE)],
             [sg.Push(), sg.Input(disabled=True, key='OUTPUT', size=28 , visible=True), sg.Btn("copy", size=BUTTON_SIZE, visible=True)],
             [sg.Push() , sg.Button("Reset", size=BUTTON_SIZE) , sg.Exit(size=BUTTON_SIZE, button_color="tomato")],
     ]
 
     window_title = "IRD PAN Search"
-    window = sg.Window(window_title, layout,use_custom_titlebar=False, finalize=True)
+    window = sg.Window(window_title, layout, use_custom_titlebar=False, finalize=True)
 
     window['-IN-'].bind("<Return>", "Search")
 
