@@ -24,6 +24,32 @@ def create_file_if_not_exist(filename):
         except:
             print('Failed creating the file', filename)
 
+
+def connected_to_internet(url='http://www.google.com/', timeout=6):
+    """To check the internet connection"""
+    try:
+        _ = requests.head(url, timeout=timeout)
+        return True
+    except requests.ConnectionError:
+        print("No internet connection available.")
+    return False
+
+def no_internet_window():
+    layout = [
+        [sg.Text("Internet connection not available!")],
+        [sg.Push(), sg.Btn("Ok", size=BUTTON_SIZE)]
+    ]
+
+    window_title = "IRD PAN Search"
+    window = sg.Window(window_title, layout, finalize=True)
+
+    while True:
+        event, values = window.read()
+        if event in (sg.WINDOW_CLOSED, "Ok"):
+            break
+        window.close()
+    raise SystemExit()
+
 def main_window():
     layout = [
             [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16), sg.Button("Search", size=BUTTON_SIZE)],
@@ -142,7 +168,8 @@ if __name__ == '__main__':
     font_size = 14
     sg.set_options(font=(font_family, font_size))
     sg.theme("Green")
-
+    if not connected_to_internet():
+        no_internet_window()
     main_window()
 
     
