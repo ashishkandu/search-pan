@@ -13,7 +13,7 @@ PAN_FETCH_URL = 'https://ird.gov.np/statstics/getPanSearch'
 output_file = "logs.json"
 
 current_path = dirname(realpath(__file__))
-log_path = f'{current_path}\{output_file}'
+# log_path = f'{current_path}\{output_file}'
 log_path = join(current_path, output_file)
 
 BUTTON_SIZE = 8
@@ -110,7 +110,7 @@ def fetch_pan(pan_no):
     #  ----------------------------->> Debugging <<---------------------------------
     response_logs = []
     create_file_if_not_exist(log_path)
-    with open(log_path) as fp:
+    with open(log_path, encoding="utf-8") as fp:
         try:
             response_logs = json.load(fp)
         except json.JSONDecodeError:
@@ -121,7 +121,7 @@ def fetch_pan(pan_no):
     log[pan_no] = res_result.json()
     response_logs.insert(0, log)
 
-    with open(log_path, 'w') as file:
+    with open(log_path, 'w', encoding="utf-8") as file:
         json.dump(response_logs, file, indent=2, ensure_ascii=False)
     
     #  ----------------------------->> Debugging End <<---------------------------------
