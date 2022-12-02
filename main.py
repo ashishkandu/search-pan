@@ -107,7 +107,7 @@ def fetch_pan(pan_no):
         sg.PopupOK("Invalid PAN!")
         return "INVALID"
     
-    # Debugging ----------------------------->> Remove <<---------------------------------
+    #  ----------------------------->> Debugging <<---------------------------------
     response_logs = []
     create_file_if_not_exist(log_path)
     with open(log_path) as fp:
@@ -117,14 +117,14 @@ def fetch_pan(pan_no):
             pass
     
     log = dict()
-    log["date"] = datetime.now().strftime("%H:%M:%S - %m/%d")
+    log["date"] = datetime.now().strftime("%m/%d - %H:%M:%S")
     log[pan_no] = res_result.json()
     response_logs.insert(0, log)
 
     with open(log_path, 'w') as file:
         json.dump(response_logs, file, indent=2, ensure_ascii=False)
     
-    # Debugging end ----------------------------->> Remove <<---------------------------------
+    #  ----------------------------->> Debugging End <<---------------------------------
 
     panDetails = res_result.json()['panDetails']
     
