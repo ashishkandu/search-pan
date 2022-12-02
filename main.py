@@ -31,7 +31,7 @@ def connected_to_internet(url='http://www.google.com/', timeout=6):
         _ = requests.head(url, timeout=timeout)
         return True
     except requests.ConnectionError:
-        print("No internet connection available.")
+        pass
     return False
 
 def no_internet_window():
@@ -154,9 +154,8 @@ def fetch_pan(pan_no):
 
     panDetails = res_result.json()['panDetails']
     
-    name = panDetails[0]['trade_Name_Eng']
-    print('Name:', " ".join(name.split()))
-    name = " ".join(name.split())
+    raw_name = panDetails[0]['trade_Name_Eng']
+    name = " ".join(raw_name.split())
     try:
         copy(name)
     except PyperclipException as exception_msg:
