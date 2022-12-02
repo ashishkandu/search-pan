@@ -27,13 +27,15 @@ def create_file_if_not_exist(filename):
 
 def main_window():
     layout = [
-            [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16), sg.Button("Search", size=BUTTON_SIZE)],
+            [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16, default_text="128064643"), sg.Button("Search", size=BUTTON_SIZE)],
             [sg.Push(), sg.Input(disabled=True, key='OUTPUT', size=28 , visible=True), sg.Btn("copy", size=BUTTON_SIZE, visible=True)],
             [sg.Push() , sg.Button("Reset", size=BUTTON_SIZE) , sg.Exit(size=BUTTON_SIZE, button_color="tomato")],
     ]
 
     window_title = "IRD PAN Search"
-    window = sg.Window(window_title, layout,use_custom_titlebar=False)
+    window = sg.Window(window_title, layout,use_custom_titlebar=False, finalize=True)
+
+    window['-IN-'].bind("<Return>", "Search")
 
     while True:
         # window['copy'].hide_row()
@@ -41,8 +43,7 @@ def main_window():
         print(event, values)
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
-        if event == "Search":
-            
+        if event in ("Search", "-IN-Search"):
             if verify_input_type(values["-IN-"]):
                 sg.popup_quick_message("Searching...")
                 fetched_name = fetch_pan(pan_no=values["-IN-"])
@@ -50,10 +51,11 @@ def main_window():
                     window['OUTPUT'].update(value=fetched_name)
         if event == "Reset":
             window['-IN-'].update(value="")
+            window['OUTPUT'].update(value="")
 
         if event == "copy":
             try:
-                copy(window['OUTPUT'])
+                copy(window['OUTPUT'].Get())
             except PyperclipException as exception_msg:
                 sg.popup_no_titlebar(exception_msg)
     window.close()
