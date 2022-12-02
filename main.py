@@ -13,7 +13,6 @@ PAN_FETCH_URL = 'https://ird.gov.np/statstics/getPanSearch'
 output_file = "logs.json"
 
 current_path = dirname(realpath(__file__))
-# log_path = f'{current_path}\{output_file}'
 log_path = join(current_path, output_file)
 
 BUTTON_SIZE = 8
@@ -38,7 +37,6 @@ def main_window():
     window['-IN-'].bind("<Return>", "Search")
 
     while True:
-        # window['copy'].hide_row()
         event, values = window.read()
         print(event, values)
         if event in (sg.WINDOW_CLOSED, "Exit"):
@@ -140,7 +138,6 @@ def fetch_pan(pan_no):
     return name
 
 if __name__ == '__main__':
-    # sg.theme_previewer()
     font_family = "monospace"
     font_size = 14
     sg.set_options(font=(font_family, font_size))
