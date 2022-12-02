@@ -112,6 +112,14 @@ def fetch_pan(pan_no):
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Linux"',
     }
+    try:
+        response = session.get(PAN_SEARCH_URL)
+    except requests.exceptions.ConnectionError:
+        sg.popup_no_titlebar("Please check your internet connection")
+        raise SystemExit()
+    except:
+        sg.popup_no_titlebar("Something went wrong.")
+        raise SystemExit()
     response = session.get(PAN_SEARCH_URL)
     soup = BeautifulSoup(response.text, 'lxml')
 
@@ -126,8 +134,14 @@ def fetch_pan(pan_no):
         'pan': pan_no,
         'captcha': captcha_value,
     }
-
-    res_result = session.post(PAN_FETCH_URL, data)
+    try:
+        res_result = session.post(PAN_FETCH_URL, data)
+    except requests.exceptions.ConnectionError:
+        sg.popup_no_titlebar("Please check your internet connection")
+        raise SystemExit()
+    except:
+        sg.PopupQuickMessage("Something went wrong.")
+        raise SystemExit()
     
     if res_result.text == '0':
         sg.PopupOK("Invalid PAN!")
