@@ -116,8 +116,8 @@ def fetch_pan(pan_no):
         except json.JSONDecodeError:
             pass
     
-    # date = datetime.today()
     log = dict()
+    log["date"] = datetime.now().strftime("%H:%M:%S - %m/%d")
     log[pan_no] = res_result.json()
     response_logs.insert(0, log)
 
