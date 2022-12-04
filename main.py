@@ -121,6 +121,7 @@ def main_window():
         try:
             if event in pan_details.keys():
                 print(pan_details[event])
+                sg.popup_notify(title="Copied", fade_in_duration=150, display_duration_in_ms=400)
                 try:
                     copy(pan_details[event])
                 except PyperclipException as exception_msg:
