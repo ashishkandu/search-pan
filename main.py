@@ -19,6 +19,17 @@ log_path = join(current_path, output_file)
 
 BUTTON_SIZE = 8
 
+fields = ('telephone', 'mobile', 'street_Name', 'vdc_Town')
+
+my_output_names = {
+                    'trade_Name_Eng': 'Name',
+                    'pan': 'PAN',
+                    'telephone': 'Telephone',
+                    'mobile': 'Mobile',
+                    'street_Name': 'Street Name',
+                    'vdc_Town': 'City Name'
+                    }
+
 def create_file_if_not_exist(filename):
     if isfile(filename) is False:
         try:
@@ -102,7 +113,7 @@ def main_window():
                         # output_rows.append([sg.Text(key_, size=12, justification="r"), sg.Input(disabled=True, key=key_, size=50), sg.Btn("copy", size=BUTTON_SIZE)])
                         if value is None:
                             continue
-                        output_rows.append([sg.Text(key_, size=12, justification='r'), sg.Text(value, auto_size_text=True, key=key_, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
+                        output_rows.append([sg.Text(my_output_names[key_], size=12, justification='r'), sg.Text(value, auto_size_text=True, key=key_, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
                     output_rows.append([sg.HorizontalSeparator(p=(0, 10))])
                     window.extend_layout(window['output_details'], output_rows)
                     window.refresh()
@@ -211,12 +222,9 @@ def fetch_pan_details(pan_no):
         raise SystemExit()
     
     # ----------------------------->> Outputs <<---------------------------------
-    fields = ('telephone', 'mobile', 'street_Name', 'vdc_Town')
-    
     details = dict()
     details['pan'] = pan_no
-    
-    # name = " ".join(panDetails['trade_Name_Eng'].split())
+
     try:
         details['trade_Name_Eng'] = " ".join(panDetails['trade_Name_Eng'].split())
     except:
