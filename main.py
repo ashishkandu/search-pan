@@ -10,6 +10,8 @@ from datetime import datetime
 PAN_SEARCH_URL = 'https://ird.gov.np/pan-search'
 PAN_FETCH_URL = 'https://ird.gov.np/statstics/getPanSearch'
 
+VERSION = 'Version 1.0.1'
+
 output_file = "logs.json"
 
 current_path = dirname(realpath(__file__))
@@ -68,9 +70,13 @@ def main_window():
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
         if event in ("Search", "-IN-Search"):
-            if verify_input_type(values["-IN-"]):
+            # Removes whitespaces
+            pan_no = values["-IN-"].strip()
+            # Number verification
+            if verify_input_type(pan_no):
                 sg.popup_quick_message("Searching...")
-                fetched_name = fetch_pan(pan_no=values["-IN-"])
+                pan_details = fetch_pan_details(pan_no=pan_no)
+                fetched_name = pan_details['trade_Name_Eng']
                 if not fetched_name == "INVALID":
                     window['OUTPUT'].update(value=fetched_name)
         if event == "Reset":
@@ -85,9 +91,8 @@ def main_window():
         
         if event == "ⓘ":
             window.disappear()
-            sg.popup("Version 1.0", "Developed by Ashish Kandu", grab_anywhere=True, title="About")
+            sg.popup(VERSION, "Developed by Ashish Kandu", grab_anywhere=True, title="About")
             window.reappear()
-            # sg.popup_notify("Developed By Ashish Kandu", title="About")
     window.close()
 
 def verify_input_type(pan_input):
@@ -101,7 +106,7 @@ def verify_input_type(pan_input):
     return False
 
 
-def fetch_pan(pan_no):
+def fetch_pan_details(pan_no):
     session = requests.Session()
     session.headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -171,16 +176,37 @@ def fetch_pan(pan_no):
         json.dump(response_logs, file, indent=2, ensure_ascii=False)
     
     #  ----------------------------->> Debugging End <<---------------------------------
-
-    panDetails = res_result.json()['panDetails']
-    
-    raw_name = panDetails[0]['trade_Name_Eng']
-    name = " ".join(raw_name.split())
     try:
-        copy(name)
+        panDetails = res_result.json()['panDetails'][0]
+    except:
+        sg.PopupNoTitlebar("Information not found in the response!")
+        raise SystemExit()
+    
+    # ----------------------------->> Outputs <<---------------------------------
+    fields = ('telephone', 'mobile', 'street_Name', 'vdc_Town')
+    
+    details = dict()
+    details['pan'] = pan_no
+    
+    # name = " ".join(panDetails['trade_Name_Eng'].split())
+    try:
+        details['trade_Name_Eng'] = " ".join(panDetails['trade_Name_Eng'].split())
+    except:
+        details['trade_Name_Eng'] = "!Problem with Name!"
+    
+    for field in fields:
+    # to check if the mentioned field goes missing
+        try:
+            details[field] = panDetails[field]
+        except KeyError as e:
+            details[e.args[0]] = 'None'
+            continue
+
+    try:
+        copy(details['trade_Name_Eng'])
     except PyperclipException as exception_msg:
         print(exception_msg)
-    return name
+    return details
 
 if __name__ == '__main__':
     font_family = "monospace"
