@@ -10,7 +10,7 @@ from datetime import datetime
 PAN_SEARCH_URL = 'https://ird.gov.np/pan-search'
 PAN_FETCH_URL = 'https://ird.gov.np/statstics/getPanSearch'
 
-VERSION = 'Version 1.0.1'
+VERSION = 'Version 1.0.5'
 
 output_file = "logs.json"
 
@@ -53,10 +53,14 @@ def no_internet_window():
     raise SystemExit()
 
 def main_window():
+    top_menu = [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16, default_text='201331187'), sg.Button("Search", size=BUTTON_SIZE), sg.Button("Reset", size=BUTTON_SIZE) ]
+    outputs = []
+    footers = [sg.Btn("ⓘ", pad=(20, 0)), sg.Push(), sg.Btn("Refresh", size=BUTTON_SIZE, button_color="DarkSeaGreen4") , sg.Exit(size=BUTTON_SIZE, button_color="tomato")]
     layout = [
-            [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16), sg.Button("Search", size=BUTTON_SIZE)],
-            [sg.Push(), sg.Input(disabled=True, key='OUTPUT', size=28 , visible=True), sg.Btn("copy", size=BUTTON_SIZE, visible=True)],
-            [sg.Btn("ⓘ", pad=(20, 0)), sg.Push() , sg.Button("Reset", size=BUTTON_SIZE) , sg.Exit(size=BUTTON_SIZE, button_color="tomato")],
+            top_menu,
+            [sg.HorizontalSeparator(p=(0, 10))],
+            [sg.Column(outputs, expand_x=True, expand_y=True, key='output_details')],
+            footers,
     ]
 
     window_title = "IRD PAN Search"
@@ -67,8 +71,22 @@ def main_window():
     while True:
         event, values = window.read()
         print(event, values)
+
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
+
+        if event == "Reset":
+            window['-IN-'].update(value="")
+
+        if event == "Refresh":
+            window.close()
+            main_window()
+        
+        if event == "ⓘ":
+            window.disappear()
+            sg.popup(VERSION, "Developed by Ashish Kandu", grab_anywhere=True, title="About")
+            window.reappear()
+        
         if event in ("Search", "-IN-Search"):
             # Removes whitespaces
             pan_no = values["-IN-"].strip()
@@ -78,10 +96,17 @@ def main_window():
                 pan_details = fetch_pan_details(pan_no=pan_no)
                 fetched_name = pan_details['trade_Name_Eng']
                 if not fetched_name == "INVALID":
-                    window['OUTPUT'].update(value=fetched_name)
-        if event == "Reset":
-            window['-IN-'].update(value="")
-            window['OUTPUT'].update(value="")
+                    output_rows = []
+                    # output_rows = [[sg.Text("Name:", size=12, justification="r"), sg.Text(key='OUTPUT', auto_size_text=True), sg.Btn("copy", size=BUTTON_SIZE)]]
+                    for key_, value in pan_details.items():
+                        # output_rows.append([sg.Text(key_, size=12, justification="r"), sg.Input(disabled=True, key=key_, size=50), sg.Btn("copy", size=BUTTON_SIZE)])
+                        if value is None:
+                            continue
+                        output_rows.append([sg.Text(key_, size=12, justification='r'), sg.Text(value, auto_size_text=True, key=key_, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
+                    output_rows.append([sg.HorizontalSeparator(p=(0, 10))])
+                    window.extend_layout(window['output_details'], output_rows)
+                    window.refresh()
+                    window.move_to_center()
 
         if event == "copy":
             try:
@@ -89,10 +114,13 @@ def main_window():
             except PyperclipException as exception_msg:
                 sg.popup_no_titlebar(exception_msg)
         
-        if event == "ⓘ":
-            window.disappear()
-            sg.popup(VERSION, "Developed by Ashish Kandu", grab_anywhere=True, title="About")
-            window.reappear()
+        try:
+            if event in pan_details.keys():
+                print(pan_details[event])
+                window[event].update(text_color="DarkSeaGreen2")
+        except UnboundLocalError:
+            pass
+
     window.close()
 
 def verify_input_type(pan_input):
