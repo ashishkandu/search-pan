@@ -110,7 +110,6 @@ def main_window():
                     output_rows = []
                     # output_rows = [[sg.Text("Name:", size=12, justification="r"), sg.Text(key='OUTPUT', auto_size_text=True), sg.Btn("copy", size=BUTTON_SIZE)]]
                     for key_, value in pan_details.items():
-                        # output_rows.append([sg.Text(key_, size=12, justification="r"), sg.Input(disabled=True, key=key_, size=50), sg.Btn("copy", size=BUTTON_SIZE)])
                         if value is None:
                             continue
                         output_rows.append([sg.Text(my_output_names[key_], size=12, justification='r'), sg.Text(value, auto_size_text=True, key=key_, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
@@ -118,16 +117,14 @@ def main_window():
                     window.extend_layout(window['output_details'], output_rows)
                     window.refresh()
                     window.move_to_center()
-
-        if event == "copy":
-            try:
-                copy(window['OUTPUT'].Get())
-            except PyperclipException as exception_msg:
-                sg.popup_no_titlebar(exception_msg)
         
         try:
             if event in pan_details.keys():
                 print(pan_details[event])
+                try:
+                    copy(pan_details[event])
+                except PyperclipException as exception_msg:
+                    sg.popup_no_titlebar(exception_msg)
                 window[event].update(text_color="DarkSeaGreen2")
         except UnboundLocalError:
             pass
