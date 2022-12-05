@@ -160,11 +160,11 @@ def fetch_pan_details(pan_no):
             details[e.args[0]] = 'None'
             continue
 
-    try:
-        copy(details['trade_Name_Eng'])
-        sg.popup_notify(details['trade_Name_Eng'], title="Copied", fade_in_duration=150, display_duration_in_ms=500)
-    except PyperclipException as exception_msg:
-        print(exception_msg)
+    # try:
+    #     copy(details['trade_Name_Eng'])
+    #     sg.popup_notify(details['trade_Name_Eng'], title="Copied", fade_in_duration=150, display_duration_in_ms=500)
+    # except PyperclipException as exception_msg:
+    #     print(exception_msg)
     return details
 
 
@@ -242,6 +242,11 @@ def main_window():
                     window.extend_layout(window['output_details'], output_rows)
                     window.refresh()
                     window.move_to_center()
+                    try:
+                        copy(fetched_name)
+                        sg.popup_notify(fetched_name, title="Copied", fade_in_duration=150, display_duration_in_ms=500)
+                    except PyperclipException as exception_msg:
+                        print(exception_msg)
         
         try:
             if event in pan_details_with_new_keys:
