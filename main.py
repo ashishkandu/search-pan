@@ -7,15 +7,11 @@ import json
 from os.path import isfile, dirname, realpath, join
 from datetime import datetime
 
-"""
-TODO
-Change the dictionary details to global and support for suffix 1, 2,.. e.g. trade_Name_Eng1
-"""
 
 PAN_SEARCH_URL = 'https://ird.gov.np/pan-search'
 PAN_FETCH_URL = 'https://ird.gov.np/statstics/getPanSearch'
 
-VERSION = 'Version 1.4.0'
+VERSION = 'Version 1.9.0'
 
 output_file = "logs.json"
 
@@ -26,6 +22,7 @@ BUTTON_SIZE = 8
 
 FIELDS = ('telephone', 'mobile', 'street_Name', 'vdc_Town')
 
+# Global Variables
 count = 0
 pan_details_with_new_keys = {}
 
