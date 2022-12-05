@@ -24,7 +24,10 @@ log_path = join(current_path, output_file)
 
 BUTTON_SIZE = 8
 
-fields = ('telephone', 'mobile', 'street_Name', 'vdc_Town')
+FIELDS = ('telephone', 'mobile', 'street_Name', 'vdc_Town')
+
+count = 0
+pan_details_with_new_keys = {}
 
 my_output_names = {
                     'trade_Name_Eng': 'Name',
@@ -149,7 +152,7 @@ def fetch_pan_details(pan_no):
     except:
         details['trade_Name_Eng'] = "!Problem with Name!"
     
-    for field in fields:
+    for field in FIELDS:
     # to check if the mentioned field goes missing
         try:
             details[field] = panDetails[field]
@@ -187,7 +190,7 @@ def main_window():
     layout = [
             top_menu,
             [sg.HorizontalSeparator(p=(0, 10))],
-            [sg.Column(outputs, expand_x=True, expand_y=True, key='output_details')],
+            [sg.Column(layout=outputs, expand_x=True, expand_y=True, key='output_details')],
             footers,
     ]
 
@@ -199,7 +202,6 @@ def main_window():
     while True:
         event, values = window.read()
         print(event, values)
-
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
 
@@ -226,21 +228,26 @@ def main_window():
                 if not fetched_name == "INVALID":
                     output_rows = []
                     # output_rows = [[sg.Text("Name:", size=12, justification="r"), sg.Text(key='OUTPUT', auto_size_text=True), sg.Btn("copy", size=BUTTON_SIZE)]]
+                    global count
+                    count += 1
+                    global pan_details_with_new_keys
                     for key_, value in pan_details.items():
+                        new_key = key_ + str(count)
+                        pan_details_with_new_keys[new_key] = value
                         if value is None:
                             continue
-                        output_rows.append([sg.Text(my_output_names[key_], size=12, justification='r'), sg.Text(value, auto_size_text=True, key=key_, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
+                        output_rows.append([sg.Text(my_output_names[key_], size=12, justification='r'), sg.Text(value, auto_size_text=True, key=new_key, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
                     output_rows.append([sg.HorizontalSeparator(p=(0, 10))])
                     window.extend_layout(window['output_details'], output_rows)
                     window.refresh()
                     window.move_to_center()
         
         try:
-            if event in pan_details.keys():
-                print(pan_details[event])
+            if event in pan_details_with_new_keys:
+                # print(pan_details_with_new_keys[event]) # For debugging
                 sg.popup_notify(title="Copied", fade_in_duration=150, display_duration_in_ms=400)
                 try:
-                    copy(pan_details[event])
+                    copy(pan_details_with_new_keys[event])
                 except PyperclipException as exception_msg:
                     sg.popup_no_titlebar(exception_msg)
                 window[event].update(text_color="DarkSeaGreen2")
