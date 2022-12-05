@@ -61,9 +61,9 @@ def verify_input_type(pan_input):
     if pan_input.isnumeric():
         return True
     if pan_input == "":
-        sg.popup_no_titlebar("PAN number is required!")
+        sg.PopupOK("PAN number is required!", title="Message", background_color='DarkOliveGreen4', auto_close=True)
         return False
-    sg.popup_quick_message("Invalid PAN number!")
+    sg.PopupOK("Invalid PAN number!", title="Message", background_color='DarkOliveGreen4', auto_close=True)
     return False
 
 
@@ -87,10 +87,10 @@ def fetch_pan_details(pan_no):
     try:
         response = session.get(PAN_SEARCH_URL)
     except requests.exceptions.ConnectionError:
-        sg.popup_no_titlebar("Please check your internet connection")
+        sg.popup_no_titlebar("Please check your internet connection", background_color='DarkOliveGreen4')
         raise SystemExit()
     except:
-        sg.popup_no_titlebar("Something went wrong.")
+        sg.popup_no_titlebar("Something went wrong.", background_color='DarkOliveGreen4')
         raise SystemExit()
     response = session.get(PAN_SEARCH_URL)
     soup = BeautifulSoup(response.text, 'lxml')
@@ -109,15 +109,15 @@ def fetch_pan_details(pan_no):
     try:
         res_result = session.post(PAN_FETCH_URL, data)
     except requests.exceptions.ConnectionError:
-        sg.popup_no_titlebar("Please check your internet connection")
+        sg.popup_no_titlebar("Please check your internet connection",background_color='DarkOliveGreen4')
         raise SystemExit()
     except:
-        sg.PopupQuickMessage("Something went wrong.")
+        sg.PopupQuickMessage("Something went wrong.", background_color='DarkOliveGreen4')
         raise SystemExit()
     
     if res_result.text == '0':
-        sg.PopupOK("Invalid PAN!")
-        return "INVALID"
+        sg.PopupOK("Invalid PAN!", title="Message", background_color='DarkOliveGreen4', auto_close=True)
+        return {"trade_Name_Eng" :"INVALID"}
     
     #  ----------------------------->> Debugging <<---------------------------------
     response_logs = []
@@ -140,7 +140,7 @@ def fetch_pan_details(pan_no):
     try:
         panDetails = res_result.json()['panDetails'][0]
     except:
-        sg.PopupNoTitlebar("Information not found in the response!")
+        sg.PopupNoTitlebar("Information not found in the response!", background_color='DarkOliveGreen4')
         raise SystemExit()
     
     # ----------------------------->> Outputs <<---------------------------------
@@ -160,11 +160,6 @@ def fetch_pan_details(pan_no):
             details[e.args[0]] = 'None'
             continue
 
-    # try:
-    #     copy(details['trade_Name_Eng'])
-    #     sg.popup_notify(details['trade_Name_Eng'], title="Copied", fade_in_duration=150, display_duration_in_ms=500)
-    # except PyperclipException as exception_msg:
-    #     print(exception_msg)
     return details
 
 
@@ -223,7 +218,7 @@ def main_window():
             pan_no = values["-IN-"].strip()
             # Number verification
             if verify_input_type(pan_no):
-                sg.popup_quick_message("Searching...")
+                sg.popup_quick_message("Searching...", background_color='DarkOliveGreen4')
                 pan_details = fetch_pan_details(pan_no=pan_no)
                 fetched_name = pan_details['trade_Name_Eng']
                 if not fetched_name == "INVALID":
@@ -251,12 +246,12 @@ def main_window():
         try:
             if event in pan_details_with_new_keys:
                 # print(pan_details_with_new_keys[event]) # For debugging
+                window[event].update(text_color="DarkSeaGreen2")
                 try:
                     copy(pan_details_with_new_keys[event])
                     sg.popup_notify(pan_details_with_new_keys[event], title="Copied", fade_in_duration=150, display_duration_in_ms=500)
                 except PyperclipException as exception_msg:
-                    sg.popup_no_titlebar(exception_msg)
-                window[event].update(text_color="DarkSeaGreen2")
+                    sg.popup_no_titlebar(exception_msg, background_color='DarkOliveGreen4')
         except UnboundLocalError:
             pass
 
