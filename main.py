@@ -7,6 +7,11 @@ import json
 from os.path import isfile, dirname, realpath, join
 from datetime import datetime
 
+"""
+TODO
+Change the dictionary details to global and support for suffix 1, 2,.. e.g. trade_Name_Eng1
+"""
+
 PAN_SEARCH_URL = 'https://ird.gov.np/pan-search'
 PAN_FETCH_URL = 'https://ird.gov.np/statstics/getPanSearch'
 
@@ -47,90 +52,6 @@ def connected_to_internet(url='http://www.google.com/', timeout=6):
         pass
     return False
 
-def no_internet_window():
-    layout = [
-        [sg.Text("Internet connection not available!")],
-        [sg.Push(), sg.Btn("Ok", size=BUTTON_SIZE)]
-    ]
-
-    window_title = "IRD PAN Search"
-    window = sg.Window(window_title, layout, finalize=True)
-
-    while True:
-        event, values = window.read()
-        if event in (sg.WINDOW_CLOSED, "Ok"):
-            break
-        window.close()
-    raise SystemExit()
-
-def main_window():
-    top_menu = [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16, default_text='201331187'), sg.Button("Search", size=BUTTON_SIZE), sg.Button("Reset", size=BUTTON_SIZE) ]
-    outputs = []
-    footers = [sg.Btn("ⓘ", pad=(20, 0)), sg.Push(), sg.Btn("Refresh", size=BUTTON_SIZE, button_color="DarkSeaGreen4") , sg.Exit(size=BUTTON_SIZE, button_color="tomato")]
-    layout = [
-            top_menu,
-            [sg.HorizontalSeparator(p=(0, 10))],
-            [sg.Column(outputs, expand_x=True, expand_y=True, key='output_details')],
-            footers,
-    ]
-
-    window_title = "IRD PAN Search"
-    window = sg.Window(window_title, layout, use_custom_titlebar=False, finalize=True)
-
-    window['-IN-'].bind("<Return>", "Search")
-
-    while True:
-        event, values = window.read()
-        print(event, values)
-
-        if event in (sg.WINDOW_CLOSED, "Exit"):
-            break
-
-        if event == "Reset":
-            window['-IN-'].update(value="")
-
-        if event == "Refresh":
-            window.close()
-            main_window()
-        
-        if event == "ⓘ":
-            window.disappear()
-            sg.popup(VERSION, "Developed by Ashish Kandu", grab_anywhere=True, title="About")
-            window.reappear()
-        
-        if event in ("Search", "-IN-Search"):
-            # Removes whitespaces
-            pan_no = values["-IN-"].strip()
-            # Number verification
-            if verify_input_type(pan_no):
-                sg.popup_quick_message("Searching...")
-                pan_details = fetch_pan_details(pan_no=pan_no)
-                fetched_name = pan_details['trade_Name_Eng']
-                if not fetched_name == "INVALID":
-                    output_rows = []
-                    # output_rows = [[sg.Text("Name:", size=12, justification="r"), sg.Text(key='OUTPUT', auto_size_text=True), sg.Btn("copy", size=BUTTON_SIZE)]]
-                    for key_, value in pan_details.items():
-                        if value is None:
-                            continue
-                        output_rows.append([sg.Text(my_output_names[key_], size=12, justification='r'), sg.Text(value, auto_size_text=True, key=key_, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
-                    output_rows.append([sg.HorizontalSeparator(p=(0, 10))])
-                    window.extend_layout(window['output_details'], output_rows)
-                    window.refresh()
-                    window.move_to_center()
-        
-        try:
-            if event in pan_details.keys():
-                print(pan_details[event])
-                sg.popup_notify(title="Copied", fade_in_duration=150, display_duration_in_ms=400)
-                try:
-                    copy(pan_details[event])
-                except PyperclipException as exception_msg:
-                    sg.popup_no_titlebar(exception_msg)
-                window[event].update(text_color="DarkSeaGreen2")
-        except UnboundLocalError:
-            pass
-
-    window.close()
 
 def verify_input_type(pan_input):
     """Verifies the input, a number or not"""
@@ -241,6 +162,93 @@ def fetch_pan_details(pan_no):
     except PyperclipException as exception_msg:
         print(exception_msg)
     return details
+
+
+def no_internet_window():
+    layout = [
+        [sg.Text("Internet connection not available!")],
+        [sg.Push(), sg.Btn("Ok", size=BUTTON_SIZE)]
+    ]
+
+    window_title = "IRD PAN Search"
+    window = sg.Window(window_title, layout, finalize=True)
+
+    while True:
+        event, values = window.read()
+        if event in (sg.WINDOW_CLOSED, "Ok"):
+            break
+        window.close()
+    raise SystemExit()
+
+def main_window():
+    top_menu = [sg.Text("PAN Number:", size=12, justification="r"), sg.Input(key="-IN-", size=16, default_text='201331187'), sg.Button("Search", size=BUTTON_SIZE), sg.Button("Reset", size=BUTTON_SIZE) ]
+    outputs = []
+    footers = [sg.Btn("ⓘ", pad=(20, 0)), sg.Push(), sg.Btn("Refresh", size=BUTTON_SIZE, button_color="DarkSeaGreen4") , sg.Exit(size=BUTTON_SIZE, button_color="tomato")]
+    layout = [
+            top_menu,
+            [sg.HorizontalSeparator(p=(0, 10))],
+            [sg.Column(outputs, expand_x=True, expand_y=True, key='output_details')],
+            footers,
+    ]
+
+    window_title = "IRD PAN Search"
+    window = sg.Window(window_title, layout, use_custom_titlebar=False, finalize=True)
+
+    window['-IN-'].bind("<Return>", "Search")
+
+    while True:
+        event, values = window.read()
+        print(event, values)
+
+        if event in (sg.WINDOW_CLOSED, "Exit"):
+            break
+
+        if event == "Reset":
+            window['-IN-'].update(value="")
+
+        if event == "Refresh":
+            window.close()
+            main_window()
+        
+        if event == "ⓘ":
+            window.disappear()
+            sg.popup(VERSION, "Developed by Ashish Kandu", grab_anywhere=True, title="About")
+            window.reappear()
+        
+        if event in ("Search", "-IN-Search"):
+            # Removes whitespaces
+            pan_no = values["-IN-"].strip()
+            # Number verification
+            if verify_input_type(pan_no):
+                sg.popup_quick_message("Searching...")
+                pan_details = fetch_pan_details(pan_no=pan_no)
+                fetched_name = pan_details['trade_Name_Eng']
+                if not fetched_name == "INVALID":
+                    output_rows = []
+                    # output_rows = [[sg.Text("Name:", size=12, justification="r"), sg.Text(key='OUTPUT', auto_size_text=True), sg.Btn("copy", size=BUTTON_SIZE)]]
+                    for key_, value in pan_details.items():
+                        if value is None:
+                            continue
+                        output_rows.append([sg.Text(my_output_names[key_], size=12, justification='r'), sg.Text(value, auto_size_text=True, key=key_, enable_events=True, relief='raised', tooltip="click to copy", p=((10, 0), 2), border_width=2)])
+                    output_rows.append([sg.HorizontalSeparator(p=(0, 10))])
+                    window.extend_layout(window['output_details'], output_rows)
+                    window.refresh()
+                    window.move_to_center()
+        
+        try:
+            if event in pan_details.keys():
+                print(pan_details[event])
+                sg.popup_notify(title="Copied", fade_in_duration=150, display_duration_in_ms=400)
+                try:
+                    copy(pan_details[event])
+                except PyperclipException as exception_msg:
+                    sg.popup_no_titlebar(exception_msg)
+                window[event].update(text_color="DarkSeaGreen2")
+        except UnboundLocalError:
+            pass
+
+    window.close()
+
 
 if __name__ == '__main__':
     font_family = "monospace"
