@@ -15,7 +15,7 @@ Change the dictionary details to global and support for suffix 1, 2,.. e.g. trad
 PAN_SEARCH_URL = 'https://ird.gov.np/pan-search'
 PAN_FETCH_URL = 'https://ird.gov.np/statstics/getPanSearch'
 
-VERSION = 'Version 1.0.5'
+VERSION = 'Version 1.4.0'
 
 output_file = "logs.json"
 
